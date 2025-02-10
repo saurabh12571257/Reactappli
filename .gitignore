@@ -30,3 +30,9 @@ yarn-error.log*
 .vscode
 *.swp
 *.swo
+
+# Environment Variables
+.env*
+.env.local
+.env.development
+.env.production
