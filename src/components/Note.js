@@ -5,8 +5,8 @@ function Note({ note, onDelete }) {
     <div className="note">
       <p className="note-text">{note.text}</p>
       <div className="note-footer">
-        <small>{note.date}</small>
-        <button onClick={() => onDelete(note._id)}>Delete</button>
+        <small>{new Date(note.createdAt).toLocaleString()}</small>
+        <button onClick={() => onDelete(note.id)}>Delete</button>
       </div>
     </div>
   );

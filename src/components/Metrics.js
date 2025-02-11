@@ -21,12 +21,12 @@ function Metrics({ notes, onDelete }) {
           </thead>
           <tbody>
             {notes.map(note => (
-              <tr key={note._id}>
-                <td>{new Date(note.date).toLocaleString()}</td>
+              <tr key={note.id}>
+                <td>{new Date(note.createdAt).toLocaleString()}</td>
                 <td>{note.text}</td>
                 <td>
                   <button 
-                    onClick={() => onDelete(note._id)}
+                    onClick={() => onDelete(note.id)}
                     className="delete-history-btn"
                   >
                     Delete
