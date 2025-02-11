@@ -6,7 +6,7 @@ import Header from './components/Header';
 import Metrics from './components/Metrics';
 import './App.css';
 
-// Add an API_URL constant
+// Add API_URL constant
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
 function App() {
@@ -29,7 +29,7 @@ function App() {
       setError(null);
     } catch (error) {
       console.error('Error fetching notes:', error);
-      setError('Failed to load notes. Please try again later.');
+      setError('Failed to load notes. Please try again.');
     } finally {
       setLoading(false);
     }
