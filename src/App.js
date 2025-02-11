@@ -6,29 +6,38 @@ import Header from './components/Header';
 import Metrics from './components/Metrics';
 import './App.css';
 
+// Add an API_URL constant
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 function App() {
   const [notes, setNotes] = useState([]);
   const [metricsHistory, setMetricsHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch notes from MongoDB
   useEffect(() => {
     fetchNotes();
   }, []);
 
   const fetchNotes = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/notes');
+      setLoading(true);
+      const response = await fetch(`${API_URL}/api/notes`);
       const data = await response.json();
       setNotes(data);
       setMetricsHistory(data);
+      setError(null);
     } catch (error) {
       console.error('Error fetching notes:', error);
+      setError('Failed to load notes. Please try again later.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const addNote = async (noteText) => {
     try {
-      const response = await fetch('http://localhost:5001/api/notes', {
+      const response = await fetch(`${API_URL}/api/notes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,24 +49,24 @@ function App() {
       setMetricsHistory([newNote, ...metricsHistory]);
     } catch (error) {
       console.error('Error adding note:', error);
+      alert('Failed to add note. Please try again.');
     }
   };
 
   const deleteNote = async (id) => {
-    // Only remove from display, not from DB
     setNotes(notes.filter(note => note._id !== id));
   };
 
   const deleteFromHistory = async (id) => {
     try {
-      // Delete from DB when removing from metrics
-      await fetch(`http://localhost:5001/api/notes/${id}`, {
+      await fetch(`${API_URL}/api/notes/${id}`, {
         method: 'DELETE',
       });
       setNotes(notes.filter(note => note._id !== id));
       setMetricsHistory(metricsHistory.filter(note => note._id !== id));
     } catch (error) {
       console.error('Error deleting note:', error);
+      alert('Failed to delete note. Please try again.');
     }
   };
 
@@ -69,8 +78,15 @@ function App() {
           <Route path="/" element={
             <main className="main-content">
               <h1 className="notes-title">Your Notes</h1>
-              <NoteForm onSubmit={addNote} />
-              <NoteList notes={notes} onDelete={deleteNote} />
+              {error && <div className="error-message">{error}</div>}
+              {loading ? (
+                <div className="loading">Loading notes...</div>
+              ) : (
+                <>
+                  <NoteForm onSubmit={addNote} />
+                  <NoteList notes={notes} onDelete={deleteNote} />
+                </>
+              )}
             </main>
           } />
           <Route path="/metrics" element={
