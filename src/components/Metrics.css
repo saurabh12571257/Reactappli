@@ -1,0 +1,82 @@
+.metrics-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.metrics-title {
+  color: #2c3e50;
+  margin-bottom: 4rem;
+  text-align: center;
+}
+
+.metrics-stats {
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.metrics-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 2rem;
+}
+
+.metrics-table th,
+.metrics-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.metrics-table th {
+  background-color: #1f5467;
+  color: white;
+}
+
+.metrics-table tr:hover {
+  background-color: #f5f6fa;
+}
+
+.metrics-list h3 {
+  margin-bottom: 2rem;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+.metrics-list {
+  margin-top: 2rem;
+}
+
+.delete-history-btn {
+  background-color: #ff5252;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+  width: 80px;
+}
+
+.delete-history-btn:hover {
+  background-color: #ff1744;
+}
+
+.metrics-table th:last-child {
+  padding-left: 5px;
+  text-align: center;
+}
+
+.metrics-table td:last-child {
+  text-align: center;
+  width: 150px;
+  padding: 1rem 35px;
+} 
