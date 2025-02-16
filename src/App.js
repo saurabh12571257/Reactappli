@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import axios from 'axios';
 import NoteForm from './components/NoteForm';
 import NoteList from './components/NoteList';
 import Header from './components/Header';
@@ -8,63 +7,96 @@ import Metrics from './components/Metrics';
 import './App.css';
 
 function App() {
-  const [homeNotes, setHomeNotes] = useState([]);
-  const [metricsNotes, setMetricsNotes] = useState([]);
+    const [notes, setNotes] = useState([]);
+    const [error, setError] = useState(null);
+    const API_ENDPOINT = 'https://5c0g4yhsjl.execute-api.ap-south-1.amazonaws.com/dev/notes';
 
-  // Fetch notes from MongoDB
-  useEffect(() => {
-    axios.get('http://localhost:5001/notes')
-      .then(response => {
-        setHomeNotes(response.data);
-        setMetricsNotes(response.data);
-      })
-      .catch(error => console.error('Error fetching notes:', error));
-  }, []);
+    const fetchNotes = () => {
+        fetch(API_ENDPOINT, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Fetched notes:', data);
+            setNotes(Array.isArray(data) ? data : []);
+            setError(null);
+        })
+        .catch(error => {
+            console.error('Error fetching notes:', error);
+            setError('Failed to fetch notes');
+        });
+    };
 
-  // Add a new note
-  const addNote = (noteText) => {
-    axios.post('http://localhost:5001/notes', { text: noteText })
-      .then(response => {
-        setHomeNotes([response.data, ...homeNotes]);
-        setMetricsNotes([response.data, ...metricsNotes]);
-      })
-      .catch(error => console.error('Error adding note:', error));
-  };
+    useEffect(() => {
+        fetchNotes();
+    }, []);
 
-  // Delete from Home Page (ONLY removes from homeNotes, NOT from metrics)
-  const deleteFromHome = (id) => {
-    setHomeNotes(prevNotes => prevNotes.filter(note => note._id !== id));
-  };
+    const addNote = (noteText) => {
+        fetch(API_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ text: noteText })
+        })
+        .then(response => response.json())
+        .then(newNote => {
+            setNotes(prevNotes => [newNote, ...prevNotes]);
+            setError(null);
+        })
+        .catch(error => {
+            console.error('Error adding note:', error);
+            setError('Failed to add note');
+        });
+    };
 
-  // Delete from Metrics Page (Removes from BOTH homeNotes and metricsNotes + MongoDB)
-  const deleteFromMetrics = (id) => {
-    setHomeNotes(prevNotes => prevNotes.filter(note => note._id !== id));
-    setMetricsNotes(prevNotes => prevNotes.filter(note => note._id !== id));
+    const deleteNote = (id) => {
+        console.log('Deleting note with ID:', id);
+        fetch(`${API_ENDPOINT}/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            setNotes(prevNotes => prevNotes.filter(note => note.id !== id));
+            setError(null);
+        })
+        .catch(error => {
+            console.error('Error deleting note:', error);
+            setError('Failed to delete note');
+        });
+    };
 
-    // Delete from MongoDB
-    axios.delete(`http://localhost:5001/notes/${id}`)
-      .catch(error => console.error('Error deleting note from DB:', error));
-  };
-
-  return (
-    <Router>
-      <div className="app">
-        <Header />
-        <Routes>
-          <Route path="/" element={
-            <main className="main-content">
-              <h1 className="notes-title">Your Notes</h1>
-              <NoteForm onSubmit={addNote} />
-              <NoteList notes={homeNotes} onDelete={deleteFromHome} />
-            </main>
-          } />
-          <Route path="/metrics" element={
-            <Metrics notes={metricsNotes} onDelete={deleteFromMetrics} />
-          } />
-        </Routes>
-      </div>
-    </Router>
-  );
+    return (
+        <Router>
+            <div className="app">
+                <Header />
+                <Routes>
+                    <Route path="/" element={
+                        <main className="main-content">
+                            <h1 className="notes-title">Your Notes</h1>
+                            {error && <div className="error-message">{error}</div>}
+                            <NoteForm onSubmit={addNote} />
+                            <NoteList notes={notes} onDelete={deleteNote} />
+                        </main>
+                    } />
+                    <Route path="/metrics" element={
+                        <Metrics notes={notes} onDelete={deleteNote} />
+                    } />
+                </Routes>
+            </div>
+        </Router>
+    );
 }
 
 export default App;

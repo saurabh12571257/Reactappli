@@ -9,7 +9,7 @@ function NoteList({ notes, onDelete }) {
       ) : (
         notes.map(note => (
           <Note
-            key={note._id}
+            key={note.id}
             note={note}
             onDelete={onDelete}
           />
