@@ -13,6 +13,7 @@ const Note = ({ note, onDelete }) => {
                     'Access-Control-Allow-Methods': 'DELETE'
                 },
                 credentials: 'omit'
+                
             });
 
             if (!response.ok) {
