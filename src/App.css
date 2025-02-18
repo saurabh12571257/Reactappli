@@ -1,33 +1,84 @@
 .App {
-  max-width: 800px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
 
-.note-form {
-  margin-bottom: 20px;
-}
-
-.note-form textarea {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  resize: vertical;
-}
-
-.note-form button {
-  background-color: #4CAF50;
+.app-header {
+  text-align: center;
+  margin-bottom: 40px;
   color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
-.note-form button:hover {
-  background-color: #45a049;
+.app-title {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.note-form {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border: 2px dashed black;
+}
+
+.note-input {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.submit-button {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.submit-button:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+}
+
+.notes-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .app-title {
+    font-size: 2rem;
+  }
+  
+  .notes-container {
+    grid-template-columns: 1fr;
+  }
 }
 
 .note-list {

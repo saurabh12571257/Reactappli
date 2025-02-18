@@ -1,70 +1,94 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import axios from 'axios';
-import NoteForm from './components/NoteForm';
-import NoteList from './components/NoteList';
-import Header from './components/Header';
-import Metrics from './components/Metrics';
 import './App.css';
+import Note from './components/Note';
 
 function App() {
-  const [homeNotes, setHomeNotes] = useState([]);
-  const [metricsNotes, setMetricsNotes] = useState([]);
+    const [notes, setNotes] = useState([]);
+    const [newNote, setNewNote] = useState('');
 
-  // Fetch notes from MongoDB
-  useEffect(() => {
-    axios.get('http://localhost:5001/notes')
-      .then(response => {
-        setHomeNotes(response.data);
-        setMetricsNotes(response.data);
-      })
-      .catch(error => console.error('Error fetching notes:', error));
-  }, []);
+    // Fetch notes
+    useEffect(() => {
+        fetchNotes();
+    }, []);
 
-  // Add a new note
-  const addNote = (noteText) => {
-    axios.post('http://localhost:5001/notes', { text: noteText })
-      .then(response => {
-        setHomeNotes([response.data, ...homeNotes]);
-        setMetricsNotes([response.data, ...metricsNotes]);
-      })
-      .catch(error => console.error('Error adding note:', error));
-  };
+    const fetchNotes = async () => {
+        try {
+            const response = await fetch('https://5c0g4yhsjl.execute-api.ap-south-1.amazonaws.com/dev/notes');
+            const data = await response.json();
+            console.log('Fetched notes:', data);
+            setNotes(data);
+        } catch (error) {
+            console.error('Error fetching notes:', error);
+        }
+    };
 
-  // Delete from Home Page (ONLY removes from homeNotes, NOT from metrics)
-  const deleteFromHome = (id) => {
-    setHomeNotes(prevNotes => prevNotes.filter(note => note._id !== id));
-  };
+    // Add note
+    const addNote = async () => {
+        if (!newNote.trim()) return;
 
-  // Delete from Metrics Page (Removes from BOTH homeNotes and metricsNotes + MongoDB)
-  const deleteFromMetrics = (id) => {
-    setHomeNotes(prevNotes => prevNotes.filter(note => note._id !== id));
-    setMetricsNotes(prevNotes => prevNotes.filter(note => note._id !== id));
+        try {
+            const response = await fetch('https://5c0g4yhsjl.execute-api.ap-south-1.amazonaws.com/dev/notes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: newNote }),
+            });
 
-    // Delete from MongoDB
-    axios.delete(`http://localhost:5001/notes/${id}`)
-      .catch(error => console.error('Error deleting note from DB:', error));
-  };
+            const data = await response.json();
+            setNotes([...notes, data]);
+            setNewNote('');
+        } catch (error) {
+            console.error('Error adding note:', error);
+        }
+    };
 
-  return (
-    <Router>
-      <div className="app">
-        <Header />
-        <Routes>
-          <Route path="/" element={
-            <main className="main-content">
-              <h1 className="notes-title">Your Notes</h1>
-              <NoteForm onSubmit={addNote} />
-              <NoteList notes={homeNotes} onDelete={deleteFromHome} />
-            </main>
-          } />
-          <Route path="/metrics" element={
-            <Metrics notes={metricsNotes} onDelete={deleteFromMetrics} />
-          } />
-        </Routes>
-      </div>
-    </Router>
-  );
+    // Delete note
+    const deleteNote = async (id) => {
+        console.log('Deleting note with ID:', id);
+        try {
+            await fetch(`https://5c0g4yhsjl.execute-api.ap-south-1.amazonaws.com/dev/notes/${id}`, {
+                method: 'DELETE',
+            });
+
+            setNotes(notes.filter(note => note.id !== id));
+        } catch (error) {
+            console.error('Error deleting note:', error);
+        }
+    };
+
+    return (
+        <div className="App">
+            <div className="container">
+                <header className="app-header">
+                    <h1 className="app-title">My Notes</h1>
+                </header>
+                
+                <div className="note-form">
+                    <input
+                        type="text"
+                        className="note-input"
+                        placeholder="Write a new note..."
+                        value={newNote}
+                        onChange={(e) => setNewNote(e.target.value)}
+                    />
+                    <button className="submit-button" onClick={addNote}>
+                        Add Note
+                    </button>
+                </div>
+
+                <div className="notes-container">
+                    {notes.map(note => (
+                        <Note 
+                            key={note.id} 
+                            note={note} 
+                            onDelete={deleteNote}
+                        />
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default App;
