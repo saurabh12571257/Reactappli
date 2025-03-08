@@ -76,7 +76,7 @@ function App() {
                         Add Note
                     </button>
                 </div>
-
+                            
                 <div className="notes-container">
                     {notes.map(note => (
                         <Note 
@@ -90,5 +90,4 @@ function App() {
         </div>
     );
 }
-
 export default App;
